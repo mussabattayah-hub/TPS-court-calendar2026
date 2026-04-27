@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Alberta Court Calendar | Official Lookup</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: system-ui, 'Segoe UI', 'Inter', -apple-system, 'Roboto', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(145deg, #eef2f9 0%, #e0e8f2 100%);
+      min-height: 100vh;
+      padding: 2rem 1.5rem;
+    }
+
+    .app-container {
+      max-width: 1300px;
+      margin: 0 auto;
+    }
+
+    .hero-card {
+      background: linear-gradient(135deg, #13294b 0%, #1c3a5f 100%);
+      border-radius: 2rem;
+      padding: 2rem 2rem 1.8rem 2rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.25);
+      color: white;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-card::before {
+      content: "⚖️";
+      font-size: 8rem;
+      position: absolute;
+      right: -20px;
+      bottom: -30px;
+      opacity: 0.08;
+      pointer-events: none;
+      transform: rotate(-8deg);
+    }
+
+    .logo-area {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .court-emblem {
+      background: #f5c542;
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    .title-text h1 {
+      font-size: 1.9rem;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      line-height: 1.2;
+    }
+
+    .title-text p {
+      color: #cbdff2;
+      font-size: 0.85rem;
+      margin-top: 4px;
+      font-weight: 500;
+    }
+
+    .badge-safe {
+      background: #2b6e4f;
+      color: white;
+      border-radius: 40px;
+      padding: 0.3rem 1.2rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 1rem;
+      letter-spacing: 0.3px;
+    }
+
+    .input-panel {
+      background: white;
+      border-radius: 1.5rem;
+      box-shadow: 0 10px 25px -8px rgba(0, 0, 0, 0.1);
+      padding: 1.8rem 2rem;
+      margin-bottom: 2rem;
+      border: 1px solid #e2edff;
+    }
+
+    .date-input-group {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      gap: 1.2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .date-field {
+      flex: 2;
+      min-width: 240px;
+    }
+
+    .date-field label {
+      display: block;
+      font-weight: 700;
+      color: #1e3a6b;
+      margin-bottom: 0.5rem;
+      font-size: 0.85rem;
+      letter-spacing: 0.3px;
+    }
+
+    .date-field input {
+      width: 100%;
+      padding: 0.9rem 1rem;
+      border: 1.5px solid #cfddee;
+      border-radius: 1.2rem;
+      font-size: 1rem;
+      background: #fefefe;
+      transition: 0.2s;
+      font-weight: 500;
+    }
+
+    .date-field input:focus {
+      outline: none;
+      border-color: #2c6e9e;
+      box-shadow: 0 0 0 3px rgba(44,110,158,0.2);
+    }
+
+    .btn-lookup {
+      background: #1f4e7a;
+      border: none;
+      padding: 0.9rem 2rem;
+      border-radius: 2.5rem;
+      font-weight: 600;
+      color: white;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+
+    .btn-lookup:hover {
+      background: #0f3b5e;
+      transform: translateY(-2px);
+      box-shadow: 0 12px 20px -12px #0f3b5e60;
+    }
+
+    .reset-btn {
+      background: #eef2fa;
+      color: #1f4e7a;
+      border: 1px solid #cbddee;
+    }
+
+    .reset-btn:hover {
+      background: #e2e8f2;
+      transform: none;
+    }
+
+    .results-card {
+      background: white;
+      border-radius: 1.5rem;
+      box-shadow: 0 12px 28px -12px rgba(0, 0, 0, 0.12);
+      overflow: hidden;
+    }
+
+    .result-header {
+      background: #f2f6fc;
+      padding: 1.3rem 2rem;
+      border-bottom: 1px solid #e2edf5;
+    }
+
+    .result-header h2 {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: #173e5f;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .info-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .info-table tr {
+      border-bottom: 1px solid #edf2f7;
+    }
+
+    .info-table tr:last-child {
+      border-bottom: none;
+    }
+
+    .info-table td {
+      padding: 1.2rem 1.8rem;
+      vertical-align: top;
+    }
+
+    .info-table td:first-child {
+      font-weight: 700;
+      background-color: #fafcff;
+      width: 38%;
+      color: #1e4a76;
+      border-right: 1px solid #e9eff6;
+    }
+
+    .info-table td:last-child {
+      color: #1f2f46;
+      font-weight: 500;
+      background: white;
+    }
+
+    .no-match {
+      padding: 2.5rem;
+      text-align: center;
+      color: #5e6f8d;
+      font-size: 1rem;
+    }
+
+    .no-match strong {
+      color: #b33c1f;
+    }
+
+    @media (max-width: 700px) {
+      body {
+        padding: 1rem;
+      }
+      .info-table td {
+        padding: 0.9rem 1rem;
+        display: block;
+        width: 100%;
+      }
+      .info-table td:first-child {
+        border-right: none;
+        background: #f8fafd;
+      }
+      .info-table tr {
+        display: block;
+        margin-bottom: 0.8rem;
+        border: 1px solid #e2edf2;
+        border-radius: 1rem;
+      }
+      .hero-card {
+        padding: 1.5rem;
+      }
+      .input-panel {
+        padding: 1.2rem;
+      }
+      .court-emblem {
+        width: 44px;
+        height: 44px;
+        font-size: 1.6rem;
+      }
+      .title-text h1 {
+        font-size: 1.4rem;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="app-container">
+  <div class="hero-card">
+    <div class="logo-area">
+      <div class="court-emblem">⚖️</div>
+      <div class="title-text">
+        <h1>Alberta Court Calendar</h1>
+        <p>Transir Public Safety | EMCS</p>
+      </div>
+    </div>
+    <div class="badge-safe">
+      <span>✓</span> CHARACTER - COMPETENCE - COMMITMENT - COLLABORATION
+    </div>
+  </div>
+
+  <div class="input-panel">
+    <div class="date-input-group">
+      <div class="date-field">
+        <label>📅 Select issue date (offence date)</label>
+        <input type="date" id="searchDate">
+      </div>
+      <button class="btn-lookup" id="lookupBtn">🔍 Find court dates</button>
+      <button class="btn-lookup reset-btn" id="todayBtn">📆 Today</button>
+    </div>
+  </div>
+
+  <div class="results-card" id="resultsContainer">
+    <div class="result-header">
+      <h2>📋 Assigned court appearances</h2>
+    </div>
+    <div id="dynamicResult">
+      <div class="no-match">⚖️ Select an issue date and press "Find court dates"</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    // Complete calendar: April 27, 2026 → January 15, 2027
+    function dateYMD(year, month, day) {
+      return new Date(year, month, day, 12, 0, 0);
+    }
+
+    const calendarData = [
+      { start: dateYMD(2026, 3, 27), end: dateYMD(2026, 3, 29), issueLabel: "Apr 27 - 29 2026", first: "May 25 - 27 2026", adultNotice: "Mon Jun 1 2026", youth: "Thu May 14 2026", community: "Tue May 19 2026" },
+      { start: dateYMD(2026, 3, 30), end: dateYMD(2026, 4, 3), issueLabel: "Apr 30 - May 3 2026", first: "May 28 - Jun 1 2026", adultNotice: "Mon Jun 8 2026", youth: "Thu May 14 2026", community: "Tue May 26 2026" },
+      { start: dateYMD(2026, 4, 4), end: dateYMD(2026, 4, 6), issueLabel: "May 4 - 6 2026", first: "Jun 22 - 24 2026", adultNotice: "Mon Jul 6 2026", youth: "Thu Jul 2 2026", community: "Tue May 26 2026" },
+      { start: dateYMD(2026, 4, 7), end: dateYMD(2026, 4, 10), issueLabel: "May 7 - 10 2026", first: "Jun 25 - 29 2026", adultNotice: "Mon Jul 13 2026", youth: "Thu Jul 2 2026", community: "Tue Jun 2 2026" },
+      { start: dateYMD(2026, 4, 11), end: dateYMD(2026, 4, 13), issueLabel: "May 11 - 13 2026", first: "Jun 29 - Jul 2 2026", adultNotice: "Mon Jul 13 2026", youth: "Thu Jul 2 2026", community: "Tue Jun 2 2026" },
+      { start: dateYMD(2026, 4, 14), end: dateYMD(2026, 4, 17), issueLabel: "May 14 - 17 2026", first: "Jul 2 - 6 2026", adultNotice: "Mon Jul 20 2026", youth: "Thu Jul 2 2026", community: "Tue Jun 9 2026" },
+      { start: dateYMD(2026, 4, 18), end: dateYMD(2026, 4, 20), issueLabel: "May 18 - 20 2026", first: "Jul 6 - 8 2026", adultNotice: "Mon Jul 20 2026", youth: "Thu Jul 2 2026", community: "Tue Jun 9 2026" },
+      { start: dateYMD(2026, 4, 21), end: dateYMD(2026, 4, 24), issueLabel: "May 21 - 24 2026", first: "Jul 9 - 13 2026", adultNotice: "Mon Jul 27 2026", youth: "Thu Jul 2 2026", community: "Tue Jun 16 2026" },
+      { start: dateYMD(2026, 4, 25), end: dateYMD(2026, 4, 27), issueLabel: "May 25 - 27 2026", first: "Jul 13 - 15 2026", adultNotice: "Mon Jul 27 2026", youth: "Thu Jul 2 2026", community: "Tue Jun 16 2026" },
+      { start: dateYMD(2026, 4, 28), end: dateYMD(2026, 4, 31), issueLabel: "May 28 - 31 2026", first: "Jul 16 - 20 2026", adultNotice: "Wed Aug 5 2026", youth: "Thu Jul 2 2026", community: "Tue Jun 23 2026" },
+      { start: dateYMD(2026, 5, 1), end: dateYMD(2026, 5, 3), issueLabel: "Jun 1 - 3 2026", first: "Jul 20 - 22 2026", adultNotice: "Wed Aug 5 2026", youth: "Thu Aug 6 2026", community: "Tue Jun 23 2026" },
+      { start: dateYMD(2026, 5, 4), end: dateYMD(2026, 5, 7), issueLabel: "Jun 4 - 7 2026", first: "Jul 23 - 27 2026", adultNotice: "Mon Aug 10 2026", youth: "Thu Aug 6 2026", community: "Tue Jun 30 2026" },
+      { start: dateYMD(2026, 5, 8), end: dateYMD(2026, 5, 10), issueLabel: "Jun 8 - 10 2026", first: "Jul 27 - 29 2026", adultNotice: "Mon Aug 10 2026", youth: "Thu Aug 6 2026", community: "Tue Jun 30 2026" },
+      { start: dateYMD(2026, 5, 11), end: dateYMD(2026, 5, 14), issueLabel: "Jun 11 - 14 2026", first: "Jul 30 - Aug 4 2026", adultNotice: "Mon Aug 17 2026", youth: "Thu Aug 6 2026", community: "Tue Jul 7 2026" },
+      { start: dateYMD(2026, 5, 15), end: dateYMD(2026, 5, 17), issueLabel: "Jun 15 - 17 2026", first: "Aug 4 - 6 2026", adultNotice: "Mon Aug 17 2026", youth: "Thu Aug 6 2026", community: "Tue Jul 7 2026" },
+      { start: dateYMD(2026, 5, 18), end: dateYMD(2026, 5, 21), issueLabel: "Jun 18 - 21 2026", first: "Aug 6 - 10 2026", adultNotice: "Mon Aug 24 2026", youth: "Thu Aug 6 2026", community: "Tue Jul 14 2026" },
+      { start: dateYMD(2026, 5, 22), end: dateYMD(2026, 5, 24), issueLabel: "Jun 22 - 24 2026", first: "Aug 10 - 12 2026", adultNotice: "Mon Aug 24 2026", youth: "Thu Aug 6 2026", community: "Tue Jul 14 2026" },
+      { start: dateYMD(2026, 5, 25), end: dateYMD(2026, 5, 28), issueLabel: "Jun 25 - 28 2026", first: "Aug 13 - 17 2026", adultNotice: "Mon Aug 31 2026", youth: "Thu Aug 6 2026", community: "Tue Jul 21 2026" },
+      { start: dateYMD(2026, 5, 29), end: dateYMD(2026, 6, 1), issueLabel: "Jun 29 - Jul 1 2026", first: "Aug 17 - 19 2026", adultNotice: "Mon Aug 31 2026", youth: "Thu Aug 6 2026", community: "Tue Jul 21 2026" },
+      { start: dateYMD(2026, 6, 2), end: dateYMD(2026, 6, 5), issueLabel: "Jul 2 - 5 2026", first: "Aug 20 - 24 2026", adultNotice: "Wed Sep 9 2026", youth: "Thu Sep 3 2026", community: "Tue Jul 28 2026" },
+      { start: dateYMD(2026, 6, 6), end: dateYMD(2026, 6, 8), issueLabel: "Jul 6 - 8 2026", first: "Aug 24 - 26 2026", adultNotice: "Wed Sep 9 2026", youth: "Thu Sep 3 2026", community: "Tue Jul 28 2026" },
+      { start: dateYMD(2026, 6, 9), end: dateYMD(2026, 6, 12), issueLabel: "Jul 9 - 12 2026", first: "Aug 27 - 31 2026", adultNotice: "Mon Sep 14 2026", youth: "Thu Sep 3 2026", community: "Tue Aug 4 2026" },
+      { start: dateYMD(2026, 6, 13), end: dateYMD(2026, 6, 15), issueLabel: "Jul 13 - 15 2026", first: "Aug 31 - Sep 2 2026", adultNotice: "Mon Sep 14 2026", youth: "Thu Sep 3 2026", community: "Tue Aug 4 2026" },
+      { start: dateYMD(2026, 6, 16), end: dateYMD(2026, 6, 19), issueLabel: "Jul 16 - 19 2026", first: "Sep 3 - 8 2026", adultNotice: "Mon Sep 21 2026", youth: "Thu Sep 3 2026", community: "Tue Aug 11 2026" },
+      { start: dateYMD(2026, 6, 20), end: dateYMD(2026, 6, 22), issueLabel: "Jul 20 - 22 2026", first: "Sep 8 - 10 2026", adultNotice: "Mon Sep 21 2026", youth: "Thu Sep 3 2026", community: "Tue Aug 11 2026" },
+      { start: dateYMD(2026, 6, 23), end: dateYMD(2026, 6, 26), issueLabel: "Jul 23 - 26 2026", first: "Sep 10 - 14 2026", adultNotice: "Mon Sep 28 2026", youth: "Thu Sep 3 2026", community: "Tue Aug 18 2026" },
+      { start: dateYMD(2026, 6, 27), end: dateYMD(2026, 6, 29), issueLabel: "Jul 27 - 29 2026", first: "Sep 14 - 16 2026", adultNotice: "Mon Sep 28 2026", youth: "Thu Sep 3 2026", community: "Tue Aug 18 2026" },
+      { start: dateYMD(2026, 6, 30), end: dateYMD(2026, 7, 2), issueLabel: "Jul 30 - Aug 2 2026", first: "Sep 17 - 21 2026", adultNotice: "Mon Oct 5 2026", youth: "Thu Sep 3 2026", community: "Tue Aug 25 2026" },
+      { start: dateYMD(2026, 7, 3), end: dateYMD(2026, 7, 5), issueLabel: "Aug 3 - 5 2026", first: "Sep 21 - 23 2026", adultNotice: "Mon Oct 5 2026", youth: "Thu Oct 1 2026", community: "Tue Aug 25 2026" },
+      { start: dateYMD(2026, 7, 6), end: dateYMD(2026, 7, 9), issueLabel: "Aug 6 - 9 2026", first: "Sep 24 - 28 2026", adultNotice: "Wed Oct 14 2026", youth: "Thu Oct 1 2026", community: "Tue Sep 1 2026" },
+      { start: dateYMD(2026, 7, 10), end: dateYMD(2026, 7, 12), issueLabel: "Aug 10 - 12 2026", first: "Sep 28 - Oct 1 2026", adultNotice: "Wed Oct 14 2026", youth: "Thu Oct 1 2026", community: "Tue Sep 1 2026" },
+      { start: dateYMD(2026, 7, 13), end: dateYMD(2026, 7, 16), issueLabel: "Aug 13 - 16 2026", first: "Oct 1 - 5 2026", adultNotice: "Mon Oct 19 2026", youth: "Thu Oct 1 2026", community: "Tue Sep 8 2026" },
+      { start: dateYMD(2026, 7, 17), end: dateYMD(2026, 7, 19), issueLabel: "Aug 17 - 19 2026", first: "Oct 5 - 7 2026", adultNotice: "Mon Oct 19 2026", youth: "Thu Oct 1 2026", community: "Tue Sep 8 2026" },
+      { start: dateYMD(2026, 7, 20), end: dateYMD(2026, 7, 23), issueLabel: "Aug 20 - 23 2026", first: "Oct 8 - 13 2026", adultNotice: "Mon Oct 26 2026", youth: "Thu Oct 1 2026", community: "Tue Sep 15 2026" },
+      { start: dateYMD(2026, 7, 24), end: dateYMD(2026, 7, 26), issueLabel: "Aug 24 - 26 2026", first: "Oct 13 - 15 2026", adultNotice: "Mon Oct 26 2026", youth: "Thu Oct 1 2026", community: "Tue Sep 15 2026" },
+      { start: dateYMD(2026, 7, 27), end: dateYMD(2026, 7, 30), issueLabel: "Aug 27 - 30 2026", first: "Oct 15 - 19 2026", adultNotice: "Mon Nov 2 2026", youth: "Thu Oct 1 2026", community: "Tue Sep 22 2026" },
+      { start: dateYMD(2026, 7, 31), end: dateYMD(2026, 8, 2), issueLabel: "Aug 31 - Sep 2 2026", first: "Oct 19 - 21 2026", adultNotice: "Mon Nov 2 2026", youth: "Thu Oct 1 2026", community: "Tue Sep 22 2026" },
+      { start: dateYMD(2026, 8, 3), end: dateYMD(2026, 8, 6), issueLabel: "Sep 3 - 6 2026", first: "Oct 22 - 26 2026", adultNotice: "Mon Nov 9 2026", youth: "Thu Nov 5 2026", community: "Tue Sep 29 2026" },
+      { start: dateYMD(2026, 8, 7), end: dateYMD(2026, 8, 9), issueLabel: "Sep 7 - 9 2026", first: "Oct 26 - 28 2026", adultNotice: "Mon Nov 9 2026", youth: "Thu Nov 5 2026", community: "Tue Sep 29 2026" },
+      { start: dateYMD(2026, 8, 10), end: dateYMD(2026, 8, 13), issueLabel: "Sep 10 - 13 2026", first: "Oct 29 - Nov 2 2026", adultNotice: "Mon Nov 16 2026", youth: "Thu Nov 5 2026", community: "Tue Oct 6 2026" },
+      { start: dateYMD(2026, 8, 14), end: dateYMD(2026, 8, 16), issueLabel: "Sep 14 - 16 2026", first: "Nov 2 - 4 2026", adultNotice: "Mon Nov 16 2026", youth: "Thu Nov 5 2026", community: "Tue Oct 6 2026" },
+      { start: dateYMD(2026, 8, 17), end: dateYMD(2026, 8, 20), issueLabel: "Sep 17 - 20 2026", first: "Nov 5 - 9 2026", adultNotice: "Mon Nov 23 2026", youth: "Thu Nov 5 2026", community: "Tue Oct 13 2026" },
+      { start: dateYMD(2026, 8, 21), end: dateYMD(2026, 8, 23), issueLabel: "Sep 21 - 23 2026", first: "Nov 9 - 12 2026", adultNotice: "Mon Nov 23 2026", youth: "Thu Nov 5 2026", community: "Tue Oct 13 2026" },
+      { start: dateYMD(2026, 8, 24), end: dateYMD(2026, 8, 27), issueLabel: "Sep 24 - 27 2026", first: "Nov 12 - 16 2026", adultNotice: "Mon Nov 30 2026", youth: "Thu Nov 5 2026", community: "Tue Oct 20 2026" },
+      { start: dateYMD(2026, 8, 28), end: dateYMD(2026, 8, 30), issueLabel: "Sep 28 - 30 2026", first: "Nov 16 - 18 2026", adultNotice: "Mon Nov 30 2026", youth: "Thu Nov 5 2026", community: "Tue Oct 20 2026" },
+      { start: dateYMD(2026, 9, 1), end: dateYMD(2026, 9, 4), issueLabel: "Oct 1 - 4 2026", first: "Nov 19 - 23 2026", adultNotice: "Mon Dec 7 2026", youth: "Thu Dec 3 2026", community: "Tue Oct 27 2026" },
+      { start: dateYMD(2026, 9, 5), end: dateYMD(2026, 9, 7), issueLabel: "Oct 5 - 7 2026", first: "Nov 23 - 25 2026", adultNotice: "Mon Dec 7 2026", youth: "Thu Dec 3 2026", community: "Tue Oct 27 2026" },
+      { start: dateYMD(2026, 9, 8), end: dateYMD(2026, 9, 11), issueLabel: "Oct 8 - 11 2026", first: "Nov 26 - 30 2026", adultNotice: "Mon Dec 14 2026", youth: "Thu Dec 3 2026", community: "Tue Nov 3 2026" },
+      { start: dateYMD(2026, 9, 12), end: dateYMD(2026, 9, 14), issueLabel: "Oct 12 - 14 2026", first: "Nov 30 - Dec 2 2026", adultNotice: "Mon Dec 14 2026", youth: "Thu Dec 3 2026", community: "Tue Nov 3 2026" },
+      { start: dateYMD(2026, 9, 15), end: dateYMD(2026, 9, 18), issueLabel: "Oct 15 - 18 2026", first: "Dec 3 - 7 2026", adultNotice: "Mon Jan 4 2027", youth: "Thu Dec 3 2026", community: "Tue Nov 10 2026" },
+      { start: dateYMD(2026, 9, 19), end: dateYMD(2026, 9, 21), issueLabel: "Oct 19 - 21 2026", first: "Dec 7 - 9 2026", adultNotice: "Mon Jan 4 2027", youth: "Thu Dec 3 2026", community: "Tue Nov 10 2026" },
+      { start: dateYMD(2026, 9, 22), end: dateYMD(2026, 9, 25), issueLabel: "Oct 22 - 25 2026", first: "Dec 10 - 14 2026", adultNotice: "Mon Jan 4 2027", youth: "Thu Dec 3 2026", community: "Tue Nov 17 2026" },
+      { start: dateYMD(2026, 9, 26), end: dateYMD(2026, 9, 28), issueLabel: "Oct 26 - 28 2026", first: "Dec 14 - 16 2026", adultNotice: "Mon Jan 4 2027", youth: "Thu Dec 3 2026", community: "Tue Nov 17 2026" },
+      { start: dateYMD(2026, 9, 29), end: dateYMD(2026, 10, 1), issueLabel: "Oct 29 - Nov 1 2026", first: "Dec 17 - Jan 4 2027", adultNotice: "Mon Jan 18 2027", youth: "Thu Dec 3 2026", community: "Tue Nov 24 2026" },
+      { start: dateYMD(2026, 10, 2), end: dateYMD(2026, 10, 4), issueLabel: "Nov 2 - 4 2026", first: "Jan 4 - 6 2027", adultNotice: "Mon Jan 18 2027", youth: "Thu Jan 7 2027", community: "Tue Nov 24 2026" },
+      { start: dateYMD(2026, 10, 5), end: dateYMD(2026, 10, 8), issueLabel: "Nov 5 - 8 2026", first: "Jan 4 - 6 2027", adultNotice: "Mon Jan 18 2027", youth: "Thu Jan 7 2027", community: "Tue Dec 1 2026" },
+      { start: dateYMD(2026, 10, 9), end: dateYMD(2026, 10, 11), issueLabel: "Nov 9 - 11 2026", first: "Jan 4 - 6 2027", adultNotice: "Mon Jan 18 2027", youth: "Thu Jan 7 2027", community: "Tue Dec 1 2026" },
+      { start: dateYMD(2026, 10, 12), end: dateYMD(2026, 10, 15), issueLabel: "Nov 12 - 15 2026", first: "Jan 4 - 6 2027", adultNotice: "Mon Jan 18 2027", youth: "Thu Jan 7 2027", community: "Tue Dec 8 2026" },
+      { start: dateYMD(2026, 10, 16), end: dateYMD(2026, 10, 18), issueLabel: "Nov 16 - 18 2026", first: "Jan 4 - 6 2027", adultNotice: "Mon Jan 18 2027", youth: "Thu Jan 7 2027", community: "Tue Dec 8 2026" },
+      { start: dateYMD(2026, 10, 19), end: dateYMD(2026, 10, 22), issueLabel: "Nov 19 - 22 2026", first: "Jan 7 - 11 2027", adultNotice: "Mon Jan 25 2027", youth: "Thu Jan 7 2027", community: "Tue Dec 15 2026" },
+      { start: dateYMD(2026, 10, 23), end: dateYMD(2026, 10, 25), issueLabel: "Nov 23 - 25 2026", first: "Jan 11 - 13 2027", adultNotice: "Mon Jan 25 2027", youth: "Thu Jan 7 2027", community: "Tue Dec 15 2026" },
+      { start: dateYMD(2026, 10, 26), end: dateYMD(2026, 10, 29), issueLabel: "Nov 26 - 29 2026", first: "Jan 14 - 18 2027", adultNotice: "Mon Feb 1 2027", youth: "Thu Jan 7 2027", community: "Tue Jan 5 2027" },
+      { start: dateYMD(2026, 10, 30), end: dateYMD(2026, 11, 2), issueLabel: "Nov 30 - Dec 2 2026", first: "Jan 18 - 20 2027", adultNotice: "Mon Feb 1 2027", youth: "Thu Jan 7 2027", community: "Tue Jan 5 2027" },
+      { start: dateYMD(2026, 11, 3), end: dateYMD(2026, 11, 6), issueLabel: "Dec 3 - 6 2026", first: "Jan 21 - 25 2027", adultNotice: "Mon Feb 8 2027", youth: "Thu Feb 4 2027", community: "Tue Jan 5 2027" },
+      { start: dateYMD(2026, 11, 7), end: dateYMD(2026, 11, 9), issueLabel: "Dec 7 - 9 2026", first: "Jan 25 - 27 2027", adultNotice: "Mon Feb 8 2027", youth: "Thu Feb 4 2027", community: "Tue Jan 5 2027" },
+      { start: dateYMD(2026, 11, 10), end: dateYMD(2026, 11, 13), issueLabel: "Dec 10 - 13 2026", first: "Jan 28 - Feb 1 2027", adultNotice: "Wed Feb 17 2027", youth: "Thu Feb 4 2027", community: "Tue Jan 5 2027" },
+      { start: dateYMD(2026, 11, 14), end: dateYMD(2026, 11, 16), issueLabel: "Dec 14 - 16 2026", first: "Feb 1 - 3 2027", adultNotice: "Wed Feb 17 2027", youth: "Thu Feb 4 2027", community: "Tue Jan 5 2027" },
+      { start: dateYMD(2026, 11, 17), end: dateYMD(2026, 11, 20), issueLabel: "Dec 17 - 20 2026", first: "Feb 4 - 8 2027", adultNotice: "Mon Feb 22 2027", youth: "Thu Feb 4 2027", community: "Tue Jan 12 2027" },
+      { start: dateYMD(2026, 11, 21), end: dateYMD(2026, 11, 23), issueLabel: "Dec 21 - 23 2026", first: "Feb 8 - 10 2027", adultNotice: "Mon Feb 22 2027", youth: "Thu Feb 4 2027", community: "Tue Jan 12 2027" },
+      { start: dateYMD(2026, 11, 24), end: dateYMD(2026, 11, 27), issueLabel: "Dec 24 - 27 2026", first: "Feb 11 - 16 2027", adultNotice: "Mon Mar 1 2027", youth: "Thu Feb 4 2027", community: "Tue Jan 19 2027" },
+      { start: dateYMD(2026, 11, 28), end: dateYMD(2026, 11, 30), issueLabel: "Dec 28 - 30 2026", first: "Feb 17 - 19 2027", adultNotice: "Mon Mar 1 2027", youth: "Thu Feb 4 2027", community: "Tue Jan 19 2027" },
+      { start: dateYMD(2026, 11, 31), end: dateYMD(2027, 0, 3), issueLabel: "Dec 31 - Jan 3 2027", first: "Feb 18 - 22 2027", adultNotice: "Mon Mar 8 2027", youth: "Thu Feb 4 2027", community: "Tue Jan 26 2027" },
+      { start: dateYMD(2027, 0, 4), end: dateYMD(2027, 0, 6), issueLabel: "Jan 4 - 6 2027", first: "Feb 22 - 24 2027", adultNotice: "Mon Mar 8 2027", youth: "Thu Mar 4 2027", community: "Tue Jan 26 2027" },
+      { start: dateYMD(2027, 0, 7), end: dateYMD(2027, 0, 10), issueLabel: "Jan 7 - 10 2027", first: "Feb 25 - Mar 1 2027", adultNotice: "Mon Mar 15 2027", youth: "Thu Mar 4 2027", community: "Tue Feb 2 2027" },
+      { start: dateYMD(2027, 0, 11), end: dateYMD(2027, 0, 13), issueLabel: "Jan 11 - 13 2027", first: "Mar 1 - 3 2027", adultNotice: "Mon Mar 15 2027", youth: "Thu Mar 4 2027", community: "Tue Feb 2 2027" },
+      { start: dateYMD(2027, 0, 14), end: dateYMD(2027, 0, 15), issueLabel: "Jan 14 - 15 2027", first: "Mar 4 - 8 2027", adultNotice: "Mon Mar 22 2027", youth: "Thu Mar 4 2027", community: "Tue Feb 9 2027" }
+    ];
+
+    function findMatchingRow(dateObj) {
+      for (let row of calendarData) {
+        if (dateObj >= row.start && dateObj <= row.end) {
+          return row;
+        }
+      }
+      return null;
+    }
+
+    function displayResult(row, searchedDateStr) {
+      const container = document.getElementById('dynamicResult');
+      if (!row) {
+        container.innerHTML = `
+          <div class="no-match">
+            ❌ <strong>No court schedule found for ${searchedDateStr}</strong><br><br>
+            Please select an issue date between <strong>April 27, 2026</strong> and <strong>January 15, 2027</strong>.
+          </div>
+        `;
+        return;
+      }
+      container.innerHTML = `
+        <table class="info-table">
+          <tr><td>⚖️ First Appearance Court (Adult)</td><td>${row.first}</td></tr>
+          <tr><td>📄 Appearance Notice (Adult)</td><td>${row.adultNotice}</td></tr>
+          <tr><td>🧑‍🦱 Youth FAC & Appearance Notice</td><td>${row.youth}</td></tr>
+          <tr><td>🏛️ Community Court</td><td>${row.community}</td></tr>
+        </table>
+      `;
+    }
+
+    function lookupFromDate(dateValue) {
+      if (!dateValue) {
+        document.getElementById('dynamicResult').innerHTML = `<div class="no-match">⚖️ Please select an issue date.</div>`;
+        return;
+      }
+      
+      // Parse the date string directly (YYYY-MM-DD) without timezone conversion
+      const parts = dateValue.split('-');
+      const year = parseInt(parts[0]);
+      const month = parseInt(parts[1]) - 1;
+      const day = parseInt(parts[2]);
+      const normalized = new Date(year, month, day, 12, 0, 0);
+      
+      const matched = findMatchingRow(normalized);
+      const displayStr = dateValue;
+      
+      displayResult(matched, displayStr);
+    }
+
+    const dateInput = document.getElementById('searchDate');
+    const lookupBtn = document.getElementById('lookupBtn');
+    const todayBtn = document.getElementById('todayBtn');
+
+    dateInput.value = "2026-04-28";
+    lookupFromDate("2026-04-28");
+
+    lookupBtn.addEventListener('click', () => {
+      if (dateInput.value) lookupFromDate(dateInput.value);
+    });
+
+    todayBtn.addEventListener('click', () => {
+      const today = new Date();
+      const yyyy = today.getFullYear();
+      const mm = String(today.getMonth() + 1).padStart(2, '0');
+      const dd = String(today.getDate()).padStart(2, '0');
+      const todayStr = `${yyyy}-${mm}-${dd}`;
+      dateInput.value = todayStr;
+      lookupFromDate(todayStr);
+    });
+
+    dateInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') lookupFromDate(dateInput.value);
+    });
+  })();
+</script>
+</body>
+</html>
