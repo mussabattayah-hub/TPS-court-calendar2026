@@ -281,7 +281,7 @@
       <div class="court-emblem">⚖️</div>
       <div class="title-text">
         <h1>Alberta Court Calendar</h1>
-        <p>Transit Public Safety | EMCS </p>
+        <p>Transit Public Safety | EMCS</p>
       </div>
     </div>
     <div class="badge-safe">
@@ -351,14 +351,6 @@
       return result;
     }
 
-    function previousValidCourtDay(startDate) {
-      const result = new Date(startDate);
-      while (!isCourtDay(result)) {
-        result.setDate(result.getDate() - 1);
-      }
-      return result;
-    }
-
     function formatDate(date) {
       const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
       const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -374,25 +366,49 @@
       }
     }
 
-    // First Appearance: 7+ weeks, any weekday, 3-day range
+    // ----- RULE 1: First Appearance (Adult) -----
+    // Min 6 weeks (42 days), Max 8 weeks (56 days), any weekday
     function calculateFirstAppearance(offenseDate) {
-      let candidate = new Date(offenseDate);
-      candidate.setDate(offenseDate.getDate() + 49);
-      let result = nextValidCourtDay(candidate);
-      let endDate = new Date(result);
-      endDate.setDate(result.getDate() + 2);
+      const minDate = new Date(offenseDate);
+      minDate.setDate(offenseDate.getDate() + 42);  // 6 weeks
+      
+      const maxDate = new Date(offenseDate);
+      maxDate.setDate(offenseDate.getDate() + 56);  // 8 weeks
+      
+      // Find first valid court day within the range
+      let candidate = new Date(minDate);
+      while (candidate <= maxDate) {
+        if (isCourtDay(candidate)) {
+          // Return a 3-day range starting from this date
+          let endDate = new Date(candidate);
+          endDate.setDate(candidate.getDate() + 2);
+          // Ensure end date is also a valid court day (move forward if needed)
+          while (!isCourtDay(endDate)) {
+            endDate.setDate(endDate.getDate() + 1);
+          }
+          return formatDateRange(candidate, endDate);
+        }
+        candidate.setDate(candidate.getDate() + 1);
+      }
+      
+      // Fallback: find nearest valid court day after minDate
+      let fallback = nextValidCourtDay(minDate);
+      let endDate = new Date(fallback);
+      endDate.setDate(fallback.getDate() + 2);
       while (!isCourtDay(endDate)) {
         endDate.setDate(endDate.getDate() + 1);
       }
-      return formatDateRange(result, endDate);
+      return formatDateRange(fallback, endDate);
     }
 
-    // Appearance Notice: 8-10 weeks, Mon or Wed only
+    // ----- RULE 2: Appearance Notice (Adult) -----
+    // Min 8 weeks (56 days), Max 10 weeks (70 days), Monday or Wednesday only
     function calculateAppearanceNotice(offenseDate) {
       const minDate = new Date(offenseDate);
       minDate.setDate(offenseDate.getDate() + 56);
       const maxDate = new Date(offenseDate);
       maxDate.setDate(offenseDate.getDate() + 70);
+      
       let candidate = new Date(minDate);
       while (candidate <= maxDate) {
         const dayOfWeek = candidate.getDay();
@@ -401,41 +417,51 @@
         }
         candidate.setDate(candidate.getDate() + 1);
       }
+      
       return formatDate(nextValidCourtDay(minDate));
     }
 
-    // Youth: First Thursday, 6-10 weeks
+    // ----- RULE 3: Youth FAC & Appearance Notice -----
+    // Min 6 weeks (42 days), Max 10 weeks (70 days), FIRST THURSDAY of each month
     function calculateYouthDate(offenseDate) {
       const minDate = new Date(offenseDate);
       minDate.setDate(offenseDate.getDate() + 42);
       const maxDate = new Date(offenseDate);
       maxDate.setDate(offenseDate.getDate() + 70);
-      let checkDate = new Date(minDate);
-      let monthsChecked = new Set();
-      while (checkDate <= maxDate) {
-        const year = checkDate.getFullYear();
-        const month = checkDate.getMonth();
-        const monthKey = `${year}-${month}`;
-        if (!monthsChecked.has(monthKey)) {
-          monthsChecked.add(monthKey);
-          const firstOfMonth = new Date(year, month, 1);
-          const daysUntilThursday = (4 - firstOfMonth.getDay() + 7) % 7;
-          const firstThursday = new Date(year, month, 1 + daysUntilThursday);
-          if (firstThursday >= minDate && firstThursday <= maxDate && isCourtDay(firstThursday)) {
-            return formatDate(firstThursday);
-          }
+
+      let year = minDate.getFullYear();
+      let month = minDate.getMonth();
+      
+      while (true) {
+        const firstOfMonth = new Date(year, month, 1);
+        if (firstOfMonth > maxDate) break;
+        
+        // Find first Thursday of this month (Thursday = 4)
+        const daysUntilThursday = (4 - firstOfMonth.getDay() + 7) % 7;
+        const firstThursday = new Date(year, month, 1 + daysUntilThursday);
+        
+        if (firstThursday >= minDate && firstThursday <= maxDate && isCourtDay(firstThursday)) {
+          return formatDate(firstThursday);
         }
-        checkDate = new Date(year, month + 1, 1);
+        
+        month++;
+        if (month > 11) {
+          month = 0;
+          year++;
+        }
       }
+      
       return formatDate(nextValidCourtDay(minDate));
     }
 
-    // Community Court: Tuesday, 5-8 weeks
+    // ----- RULE 4: Community Court -----
+    // Min 5 weeks (35 days), Max 8 weeks (56 days), Tuesday only
     function calculateCommunityCourt(offenseDate) {
       const minDate = new Date(offenseDate);
       minDate.setDate(offenseDate.getDate() + 35);
       const maxDate = new Date(offenseDate);
       maxDate.setDate(offenseDate.getDate() + 56);
+      
       let candidate = new Date(minDate);
       while (candidate <= maxDate) {
         if (candidate.getDay() === 2 && isCourtDay(candidate)) {
@@ -443,6 +469,7 @@
         }
         candidate.setDate(candidate.getDate() + 1);
       }
+      
       let fallback = new Date(minDate);
       while (fallback.getDay() !== 2 || !isCourtDay(fallback)) {
         fallback.setDate(fallback.getDate() + 1);
@@ -450,96 +477,98 @@
       return formatDate(fallback);
     }
 
-    // Issue date ranges
+    // Issue date ranges (from specimen calendar)
     const issueRanges = [
-      { start: [2026, 4, 4], end: [2026, 4, 6] },
-      { start: [2026, 4, 7], end: [2026, 4, 10] },
-      { start: [2026, 4, 11], end: [2026, 4, 13] },
-      { start: [2026, 4, 14], end: [2026, 4, 17] },
-      { start: [2026, 4, 18], end: [2026, 4, 20] },
-      { start: [2026, 4, 21], end: [2026, 4, 24] },
-      { start: [2026, 4, 25], end: [2026, 4, 27] },
-      { start: [2026, 4, 28], end: [2026, 4, 31] },
-      { start: [2026, 5, 1], end: [2026, 5, 3] },
-      { start: [2026, 5, 4], end: [2026, 5, 7] },
-      { start: [2026, 5, 8], end: [2026, 5, 10] },
-      { start: [2026, 5, 11], end: [2026, 5, 14] },
-      { start: [2026, 5, 15], end: [2026, 5, 17] },
-      { start: [2026, 5, 18], end: [2026, 5, 21] },
-      { start: [2026, 5, 22], end: [2026, 5, 24] },
-      { start: [2026, 5, 25], end: [2026, 5, 28] },
-      { start: [2026, 5, 29], end: [2026, 6, 1] },
-      { start: [2026, 6, 2], end: [2026, 6, 5] },
-      { start: [2026, 6, 6], end: [2026, 6, 8] },
-      { start: [2026, 6, 9], end: [2026, 6, 12] },
-      { start: [2026, 6, 13], end: [2026, 6, 15] },
-      { start: [2026, 6, 16], end: [2026, 6, 19] },
-      { start: [2026, 6, 20], end: [2026, 6, 22] },
-      { start: [2026, 6, 23], end: [2026, 6, 26] },
-      { start: [2026, 6, 27], end: [2026, 6, 29] },
-      { start: [2026, 6, 30], end: [2026, 7, 2] },
-      { start: [2026, 7, 3], end: [2026, 7, 5] },
-      { start: [2026, 7, 6], end: [2026, 7, 9] },
-      { start: [2026, 7, 10], end: [2026, 7, 12] },
-      { start: [2026, 7, 13], end: [2026, 7, 16] },
-      { start: [2026, 7, 17], end: [2026, 7, 19] },
-      { start: [2026, 7, 20], end: [2026, 7, 23] },
-      { start: [2026, 7, 24], end: [2026, 7, 26] },
-      { start: [2026, 7, 27], end: [2026, 7, 30] },
-      { start: [2026, 7, 31], end: [2026, 8, 2] },
-      { start: [2026, 8, 3], end: [2026, 8, 6] },
-      { start: [2026, 8, 7], end: [2026, 8, 9] },
-      { start: [2026, 8, 10], end: [2026, 8, 13] },
-      { start: [2026, 8, 14], end: [2026, 8, 16] },
-      { start: [2026, 8, 17], end: [2026, 8, 20] },
-      { start: [2026, 8, 21], end: [2026, 8, 23] },
-      { start: [2026, 8, 24], end: [2026, 8, 27] },
-      { start: [2026, 8, 28], end: [2026, 8, 30] },
-      { start: [2026, 9, 1], end: [2026, 9, 4] },
-      { start: [2026, 9, 5], end: [2026, 9, 7] },
-      { start: [2026, 9, 8], end: [2026, 9, 11] },
-      { start: [2026, 9, 12], end: [2026, 9, 14] },
-      { start: [2026, 9, 15], end: [2026, 9, 18] },
-      { start: [2026, 9, 19], end: [2026, 9, 21] },
-      { start: [2026, 9, 22], end: [2026, 9, 25] },
-      { start: [2026, 9, 26], end: [2026, 9, 28] },
-      { start: [2026, 9, 29], end: [2026, 10, 1] },
-      { start: [2026, 10, 2], end: [2026, 10, 4] },
-      { start: [2026, 10, 5], end: [2026, 10, 8] },
-      { start: [2026, 10, 9], end: [2026, 10, 11] },
-      { start: [2026, 10, 12], end: [2026, 10, 15] },
-      { start: [2026, 10, 16], end: [2026, 10, 18] },
-      { start: [2026, 10, 19], end: [2026, 10, 22] },
-      { start: [2026, 10, 23], end: [2026, 10, 25] },
-      { start: [2026, 10, 26], end: [2026, 10, 29] },
-      { start: [2026, 10, 30], end: [2026, 11, 2] },
-      { start: [2026, 11, 3], end: [2026, 11, 6] },
-      { start: [2026, 11, 7], end: [2026, 11, 9] },
-      { start: [2026, 11, 10], end: [2026, 11, 13] },
-      { start: [2026, 11, 14], end: [2026, 11, 16] },
-      { start: [2026, 11, 17], end: [2026, 11, 20] },
-      { start: [2026, 11, 21], end: [2026, 11, 23] },
-      { start: [2026, 11, 24], end: [2026, 11, 27] },
-      { start: [2026, 11, 28], end: [2026, 11, 30] },
-      { start: [2026, 11, 31], end: [2027, 0, 3] },
-      { start: [2027, 0, 4], end: [2027, 0, 6] },
-      { start: [2027, 0, 7], end: [2027, 0, 10] },
-      { start: [2027, 0, 11], end: [2027, 0, 13] },
-      { start: [2027, 0, 14], end: [2027, 0, 15] }
+      { start: [2026, 4, 4], end: [2026, 4, 6] },      // May 4-6
+      { start: [2026, 4, 7], end: [2026, 4, 10] },     // May 7-10
+      { start: [2026, 4, 11], end: [2026, 4, 13] },    // May 11-13
+      { start: [2026, 4, 14], end: [2026, 4, 17] },    // May 14-17
+      { start: [2026, 4, 18], end: [2026, 4, 20] },    // May 18-20
+      { start: [2026, 4, 21], end: [2026, 4, 24] },    // May 21-24
+      { start: [2026, 4, 25], end: [2026, 4, 27] },    // May 25-27
+      { start: [2026, 4, 28], end: [2026, 4, 31] },    // May 28-31
+      { start: [2026, 5, 1], end: [2026, 5, 3] },      // Jun 1-3
+      { start: [2026, 5, 4], end: [2026, 5, 7] },      // Jun 4-7
+      { start: [2026, 5, 8], end: [2026, 5, 10] },     // Jun 8-10
+      { start: [2026, 5, 11], end: [2026, 5, 14] },    // Jun 11-14
+      { start: [2026, 5, 15], end: [2026, 5, 17] },    // Jun 15-17
+      { start: [2026, 5, 18], end: [2026, 5, 21] },    // Jun 18-21
+      { start: [2026, 5, 22], end: [2026, 5, 24] },    // Jun 22-24
+      { start: [2026, 5, 25], end: [2026, 5, 28] },    // Jun 25-28
+      { start: [2026, 5, 29], end: [2026, 6, 1] },     // Jun 29-Jul 1
+      { start: [2026, 6, 2], end: [2026, 6, 5] },      // Jul 2-5
+      { start: [2026, 6, 6], end: [2026, 6, 8] },      // Jul 6-8
+      { start: [2026, 6, 9], end: [2026, 6, 12] },     // Jul 9-12
+      { start: [2026, 6, 13], end: [2026, 6, 15] },    // Jul 13-15
+      { start: [2026, 6, 16], end: [2026, 6, 19] },    // Jul 16-19
+      { start: [2026, 6, 20], end: [2026, 6, 22] },    // Jul 20-22
+      { start: [2026, 6, 23], end: [2026, 6, 26] },    // Jul 23-26
+      { start: [2026, 6, 27], end: [2026, 6, 29] },    // Jul 27-29
+      { start: [2026, 6, 30], end: [2026, 7, 2] },     // Jul 30-Aug 2
+      { start: [2026, 7, 3], end: [2026, 7, 5] },      // Aug 3-5
+      { start: [2026, 7, 6], end: [2026, 7, 9] },      // Aug 6-9
+      { start: [2026, 7, 10], end: [2026, 7, 12] },    // Aug 10-12
+      { start: [2026, 7, 13], end: [2026, 7, 16] },    // Aug 13-16
+      { start: [2026, 7, 17], end: [2026, 7, 19] },    // Aug 17-19
+      { start: [2026, 7, 20], end: [2026, 7, 23] },    // Aug 20-23
+      { start: [2026, 7, 24], end: [2026, 7, 26] },    // Aug 24-26
+      { start: [2026, 7, 27], end: [2026, 7, 30] },    // Aug 27-30
+      { start: [2026, 7, 31], end: [2026, 8, 2] },     // Aug 31-Sep 2
+      { start: [2026, 8, 3], end: [2026, 8, 6] },      // Sep 3-6
+      { start: [2026, 8, 7], end: [2026, 8, 9] },      // Sep 7-9
+      { start: [2026, 8, 10], end: [2026, 8, 13] },    // Sep 10-13
+      { start: [2026, 8, 14], end: [2026, 8, 16] },    // Sep 14-16
+      { start: [2026, 8, 17], end: [2026, 8, 20] },    // Sep 17-20
+      { start: [2026, 8, 21], end: [2026, 8, 23] },    // Sep 21-23
+      { start: [2026, 8, 24], end: [2026, 8, 27] },    // Sep 24-27
+      { start: [2026, 8, 28], end: [2026, 8, 30] },    // Sep 28-30
+      { start: [2026, 9, 1], end: [2026, 9, 4] },      // Oct 1-4
+      { start: [2026, 9, 5], end: [2026, 9, 7] },      // Oct 5-7
+      { start: [2026, 9, 8], end: [2026, 9, 11] },     // Oct 8-11
+      { start: [2026, 9, 12], end: [2026, 9, 14] },    // Oct 12-14
+      { start: [2026, 9, 15], end: [2026, 9, 18] },    // Oct 15-18
+      { start: [2026, 9, 19], end: [2026, 9, 21] },    // Oct 19-21
+      { start: [2026, 9, 22], end: [2026, 9, 25] },    // Oct 22-25
+      { start: [2026, 9, 26], end: [2026, 9, 28] },    // Oct 26-28
+      { start: [2026, 9, 29], end: [2026, 10, 1] },    // Oct 29-Nov 1
+      { start: [2026, 10, 2], end: [2026, 10, 4] },    // Nov 2-4
+      { start: [2026, 10, 5], end: [2026, 10, 8] },    // Nov 5-8
+      { start: [2026, 10, 9], end: [2026, 10, 11] },   // Nov 9-11
+      { start: [2026, 10, 12], end: [2026, 10, 15] },  // Nov 12-15
+      { start: [2026, 10, 16], end: [2026, 10, 18] },  // Nov 16-18
+      { start: [2026, 10, 19], end: [2026, 10, 22] },  // Nov 19-22
+      { start: [2026, 10, 23], end: [2026, 10, 25] },  // Nov 23-25
+      { start: [2026, 10, 26], end: [2026, 10, 29] },  // Nov 26-29
+      { start: [2026, 10, 30], end: [2026, 11, 2] },   // Nov 30-Dec 2
+      { start: [2026, 11, 3], end: [2026, 11, 6] },    // Dec 3-6
+      { start: [2026, 11, 7], end: [2026, 11, 9] },    // Dec 7-9
+      { start: [2026, 11, 10], end: [2026, 11, 13] },  // Dec 10-13
+      { start: [2026, 11, 14], end: [2026, 11, 16] },  // Dec 14-16
+      { start: [2026, 11, 17], end: [2026, 11, 20] },  // Dec 17-20
+      { start: [2026, 11, 21], end: [2026, 11, 23] },  // Dec 21-23
+      { start: [2026, 11, 24], end: [2026, 11, 27] },  // Dec 24-27
+      { start: [2026, 11, 28], end: [2026, 11, 30] },  // Dec 28-30
+      { start: [2026, 11, 31], end: [2027, 0, 3] },    // Dec 31-Jan 3
+      { start: [2027, 0, 4], end: [2027, 0, 6] },      // Jan 4-6
+      { start: [2027, 0, 7], end: [2027, 0, 10] },     // Jan 7-10
+      { start: [2027, 0, 11], end: [2027, 0, 13] },    // Jan 11-13
+      { start: [2027, 0, 14], end: [2027, 0, 15] }     // Jan 14-15
     ];
 
     const calendarData = [];
     for (const range of issueRanges) {
       const startDate = new Date(range.start[0], range.start[1], range.start[2], 12, 0, 0);
       const endDate = new Date(range.end[0], range.end[1], range.end[2], 12, 0, 0);
-      const midpoint = new Date((startDate.getTime() + endDate.getTime()) / 2);
+      // Use the start date of the range for calculations (more conservative)
+      const offenseDate = startDate;
+      
       calendarData.push({
         start: startDate,
         end: endDate,
-        firstAppearance: calculateFirstAppearance(midpoint),
-        appearanceNotice: calculateAppearanceNotice(midpoint),
-        youthDate: calculateYouthDate(midpoint),
-        communityCourt: calculateCommunityCourt(midpoint)
+        firstAppearance: calculateFirstAppearance(offenseDate),
+        appearanceNotice: calculateAppearanceNotice(offenseDate),
+        youthDate: calculateYouthDate(offenseDate),
+        communityCourt: calculateCommunityCourt(offenseDate)
       });
     }
 
@@ -565,13 +594,13 @@
       }
       container.innerHTML = `
         <table class="info-table">
-          <tr><td>⚖️ First Appearance Court (Adult)</td><td>${row.firstAppearance}</td></tr>
-          <tr><td>📄 Appearance Notice (Adult)</td><td>${row.appearanceNotice}</td></tr>
-          <tr><td>🧑‍🦱 Youth FAC & Appearance Notice</td><td>${row.youthDate}</td></tr>
-          <tr><td>🏛️ Community Court</td><td>${row.communityCourt}</td></tr>
+          <tr><td style="background:#e8f0fe;">⚖️ First Appearance Court (Adult)</td><td>${row.firstAppearance}</td></tr>
+          <tr><td style="background:#e8f0fe;">📄 Appearance Notice (Adult)</td><td>${row.appearanceNotice}</td></tr>
+          <tr><td style="background:#e8f0fe;">🧑‍🦱 Youth FAC & Appearance Notice</td><td>${row.youthDate}</td></tr>
+          <tr><td style="background:#e8f0fe;">🏛️ Community Court</td><td>${row.communityCourt}</td></tr>
         </table>
         <div style="padding: 0.8rem 1.8rem 1.2rem 1.8rem; font-size:0.7rem; background:#f0f4fa; border-top:1px solid #e0e8f0;">
-          ✅ All dates: Weekdays | No statutory holidays | No Dec 18 - Jan 4
+          ✅ All dates: Weekdays only | No Alberta statutory holidays | No Dec 18 - Jan 4 blackout
         </div>
       `;
     }
