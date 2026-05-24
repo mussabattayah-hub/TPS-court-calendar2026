@@ -1,649 +1,758 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Alberta Court Calendar | Official Lookup</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: system-ui, 'Segoe UI', 'Inter', -apple-system, 'Roboto', sans-serif;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0d2137">
+<title>AB Court Dates 2026–27</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
 
-    body {
-      background: linear-gradient(145deg, #eef2f9 0%, #e0e8f2 100%);
-      min-height: 100vh;
-      padding: 2rem 1.5rem;
-    }
+/* ═══════════════════════════════════════
+   TOKENS
+═══════════════════════════════════════ */
+:root {
+  --navy:        #0d2137;
+  --navy-mid:    #152e4a;
+  --navy-light:  #1e4068;
+  --blue:        #1a6faf;
+  --blue-bright: #2589d4;
+  --sky:         #4aadee;
+  --sky-pale:    #dbeeff;
+  --white:       #ffffff;
+  --off-white:   #f5f8fc;
+  --grey-100:    #e8edf4;
+  --grey-300:    #b8c5d4;
+  --grey-500:    #6b7e94;
+  --grey-700:    #374a5c;
+  --text-main:   #0d1f2d;
+  --text-soft:   #4a6070;
+  --green:       #0fa87e;
+  --amber:       #e09c00;
+  --red:         #c94040;
 
-    .app-container {
-      max-width: 1300px;
-      margin: 0 auto;
-    }
+  --sans: 'DM Sans', system-ui, sans-serif;
+  --mono: 'DM Mono', 'Courier New', monospace;
 
-    .hero-card {
-      background: linear-gradient(135deg, #13294b 0%, #1c3a5f 100%);
-      border-radius: 2rem;
-      padding: 2rem 2rem 1.8rem 2rem;
-      margin-bottom: 2rem;
-      box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.25);
-      color: white;
-      position: relative;
-      overflow: hidden;
-    }
+  --r-sm:  10px;
+  --r-md:  16px;
+  --r-lg:  22px;
+  --r-xl:  28px;
 
-    .hero-card::before {
-      content: "⚖️";
-      font-size: 8rem;
-      position: absolute;
-      right: -20px;
-      bottom: -30px;
-      opacity: 0.08;
-      pointer-events: none;
-      transform: rotate(-8deg);
-    }
+  --shadow-card: 0 4px 24px rgba(13,33,55,0.13);
+  --shadow-lift: 0 8px 32px rgba(13,33,55,0.18);
+}
 
-    .logo-area {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      margin-bottom: 0.75rem;
-    }
+/* ═══════════════════════════════════════
+   RESET & BASE
+═══════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    .court-emblem {
-      background: #f5c542;
-      width: 52px;
-      height: 52px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2rem;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    }
+html { -webkit-text-size-adjust: 100%; }
 
-    .title-text h1 {
-      font-size: 1.9rem;
-      font-weight: 700;
-      letter-spacing: -0.3px;
-      line-height: 1.2;
-    }
+body {
+  font-family: var(--sans);
+  background: var(--off-white);
+  color: var(--text-main);
+  min-height: 100dvh;
+  /* safe area insets for iPhone notch / home indicator */
+  padding-bottom: env(safe-area-inset-bottom);
+}
 
-    .title-text p {
-      color: #cbdff2;
-      font-size: 0.85rem;
-      margin-top: 4px;
-      font-weight: 500;
-    }
+/* ═══════════════════════════════════════
+   HEADER
+═══════════════════════════════════════ */
+.header {
+  background: linear-gradient(160deg, var(--navy) 0%, var(--navy-mid) 60%, var(--navy-light) 100%);
+  padding: calc(env(safe-area-inset-top) + 20px) 20px 24px;
+  position: relative;
+  overflow: hidden;
+}
 
-    .badge-safe {
-      background: #2b6e4f;
-      color: white;
-      border-radius: 40px;
-      padding: 0.3rem 1.2rem;
-      font-size: 0.75rem;
-      font-weight: 600;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      margin-top: 1rem;
-      letter-spacing: 0.3px;
-    }
+/* subtle blueprint-grid watermark */
+.header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(42,137,212,0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(42,137,212,0.07) 1px, transparent 1px);
+  background-size: 32px 32px;
+  pointer-events: none;
+}
 
-    .input-panel {
-      background: white;
-      border-radius: 1.5rem;
-      box-shadow: 0 10px 25px -8px rgba(0, 0, 0, 0.1);
-      padding: 1.8rem 2rem;
-      margin-bottom: 2rem;
-      border: 1px solid #e2edff;
-    }
+/* gavel watermark */
+.header::after {
+  content: '⚖';
+  position: absolute;
+  right: -10px;
+  bottom: -18px;
+  font-size: 100px;
+  opacity: 0.05;
+  pointer-events: none;
+  line-height: 1;
+}
 
-    .date-input-group {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: flex-end;
-      gap: 1.2rem;
-      margin-bottom: 0.5rem;
-    }
+.header-inner {
+  position: relative;
+  z-index: 1;
+  max-width: 640px;
+  margin: 0 auto;
+}
 
-    .date-field {
-      flex: 2;
-      min-width: 240px;
-    }
+.header-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
 
-    .date-field label {
-      display: block;
-      font-weight: 700;
-      color: #1e3a6b;
-      margin-bottom: 0.5rem;
-      font-size: 0.85rem;
-      letter-spacing: 0.3px;
-    }
+.badge {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  padding: 3px 9px;
+  border-radius: 40px;
+  background: rgba(74,173,238,0.18);
+  color: var(--sky);
+  border: 1px solid rgba(74,173,238,0.3);
+}
 
-    .date-field input {
-      width: 100%;
-      padding: 0.9rem 1rem;
-      border: 1.5px solid #cfddee;
-      border-radius: 1.2rem;
-      font-size: 1rem;
-      background: #fefefe;
-      transition: 0.2s;
-      font-weight: 500;
-    }
+.badge-alberta {
+  background: rgba(255,255,255,0.08);
+  color: var(--grey-300);
+  border-color: rgba(255,255,255,0.12);
+}
 
-    .date-field input:focus {
-      outline: none;
-      border-color: #2c6e9e;
-      box-shadow: 0 0 0 3px rgba(44,110,158,0.2);
-    }
+.header h1 {
+  font-size: clamp(20px, 5.5vw, 26px);
+  font-weight: 700;
+  color: var(--white);
+  line-height: 1.2;
+  letter-spacing: -0.3px;
+}
 
-    .btn-lookup {
-      background: #1f4e7a;
-      border: none;
-      padding: 0.9rem 2rem;
-      border-radius: 2.5rem;
-      font-weight: 600;
-      color: white;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: 0.2s;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-    }
+.header-sub {
+  margin-top: 5px;
+  font-size: 13px;
+  color: var(--grey-300);
+  font-weight: 400;
+  letter-spacing: 0.1px;
+}
 
-    .btn-lookup:hover {
-      background: #0f3b5e;
-      transform: translateY(-2px);
-      box-shadow: 0 12px 20px -12px #0f3b5e60;
-    }
+.header-rules {
+  margin-top: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
 
-    .reset-btn {
-      background: #eef2fa;
-      color: #1f4e7a;
-      border: 1px solid #cbddee;
-    }
+.rule-chip {
+  font-size: 11px;
+  font-family: var(--mono);
+  color: var(--sky);
+  background: rgba(74,173,238,0.1);
+  border: 1px solid rgba(74,173,238,0.2);
+  border-radius: 40px;
+  padding: 3px 10px;
+  white-space: nowrap;
+}
 
-    .reset-btn:hover {
-      background: #e2e8f2;
-      transform: none;
-    }
+/* ═══════════════════════════════════════
+   MAIN CONTENT AREA
+═══════════════════════════════════════ */
+.main {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 20px 16px 40px;
+}
 
-    .results-card {
-      background: white;
-      border-radius: 1.5rem;
-      box-shadow: 0 12px 28px -12px rgba(0, 0, 0, 0.12);
-      overflow: hidden;
-    }
+/* ═══════════════════════════════════════
+   INPUT CARD
+═══════════════════════════════════════ */
+.input-card {
+  background: var(--white);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-card);
+  padding: 20px;
+  margin-bottom: 18px;
+  border: 1px solid var(--grey-100);
+}
 
-    .result-header {
-      background: #f2f6fc;
-      padding: 1.3rem 2rem;
-      border-bottom: 1px solid #e2edf5;
-    }
+.input-label {
+  display: block;
+  font-size: 11px;
+  font-family: var(--mono);
+  font-weight: 500;
+  letter-spacing: 1.1px;
+  text-transform: uppercase;
+  color: var(--grey-500);
+  margin-bottom: 10px;
+}
 
-    .result-header h2 {
-      font-size: 1.4rem;
-      font-weight: 600;
-      color: #173e5f;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+.input-row {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
 
-    .info-table {
-      width: 100%;
-      border-collapse: collapse;
-    }
+input[type="date"] {
+  flex: 1;
+  font-family: var(--mono);
+  font-size: 16px; /* 16px prevents iOS zoom on focus */
+  font-weight: 500;
+  color: var(--text-main);
+  background: var(--off-white);
+  border: 1.5px solid var(--grey-100);
+  border-radius: var(--r-sm);
+  padding: 13px 14px;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+  min-width: 0;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
 
-    .info-table tr {
-      border-bottom: 1px solid #edf2f7;
-    }
+input[type="date"]:focus {
+  border-color: var(--blue-bright);
+  box-shadow: 0 0 0 3px rgba(37,137,212,0.15);
+  background: var(--white);
+}
 
-    .info-table tr:last-child {
-      border-bottom: none;
-    }
+.btn {
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 600;
+  padding: 13px 18px;
+  border-radius: var(--r-sm);
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
 
-    .info-table td {
-      padding: 1.2rem 1.8rem;
-      vertical-align: top;
-    }
+.btn:active { transform: scale(0.96); }
 
-    .info-table td:first-child {
-      font-weight: 700;
-      background-color: #fafcff;
-      width: 35%;
-      color: #1e4a76;
-      border-right: 1px solid #e9eff6;
-    }
+.btn-primary {
+  background: var(--blue);
+  color: var(--white);
+  box-shadow: 0 2px 10px rgba(26,111,175,0.35);
+}
+.btn-primary:hover { background: #155e96; }
 
-    .info-table td:last-child {
-      color: #1f2f46;
-      font-weight: 500;
-      background: white;
-    }
+.btn-secondary {
+  background: var(--off-white);
+  color: var(--blue);
+  border: 1.5px solid var(--grey-100);
+}
+.btn-secondary:hover { background: var(--grey-100); }
 
-    .no-match {
-      padding: 2.5rem;
-      text-align: center;
-      color: #5e6f8d;
-      font-size: 1rem;
-    }
+.range-note {
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--grey-500);
+  font-family: var(--mono);
+}
+.range-note strong { color: var(--blue); }
 
-    .no-match strong {
-      color: #b33c1f;
-    }
+/* ═══════════════════════════════════════
+   ERROR BOX
+═══════════════════════════════════════ */
+.error-box {
+  background: #fff5f5;
+  border: 1.5px solid #f5c0c0;
+  border-left: 4px solid var(--red);
+  border-radius: var(--r-sm);
+  padding: 14px 16px;
+  font-size: 13.5px;
+  color: #8b2020;
+  margin-bottom: 18px;
+  display: none;
+  line-height: 1.5;
+}
 
-    @media (max-width: 700px) {
-      body {
-        padding: 1rem;
-      }
-      .info-table td {
-        padding: 0.9rem 1rem;
-        display: block;
-        width: 100%;
-      }
-      .info-table td:first-child {
-        border-right: none;
-        background: #f8fafd;
-      }
-      .info-table tr {
-        display: block;
-        margin-bottom: 0.8rem;
-        border: 1px solid #e2edf2;
-        border-radius: 1rem;
-      }
-      .hero-card {
-        padding: 1.5rem;
-      }
-      .input-panel {
-        padding: 1.2rem;
-      }
-      .court-emblem {
-        width: 44px;
-        height: 44px;
-        font-size: 1.6rem;
-      }
-      .title-text h1 {
-        font-size: 1.4rem;
-      }
-    }
-  </style>
+/* ═══════════════════════════════════════
+   RESULTS BLOCK
+═══════════════════════════════════════ */
+.results-block {
+  display: none;
+  animation: fadeUp 0.25s ease;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* issue date pill */
+.issue-pill {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--navy);
+  border-radius: var(--r-md);
+  padding: 13px 16px;
+  margin-bottom: 14px;
+}
+
+.issue-pill-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 1.1px;
+  text-transform: uppercase;
+  color: var(--sky);
+  opacity: 0.75;
+}
+
+.issue-pill-date {
+  font-family: var(--mono);
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--white);
+}
+
+/* date cards grid */
+.date-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.date-card {
+  background: var(--white);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-card);
+  border: 1px solid var(--grey-100);
+  overflow: hidden;
+  position: relative;
+  transition: box-shadow 0.15s;
+}
+
+/* top colour bar per column */
+.date-card::before {
+  content: '';
+  display: block;
+  height: 4px;
+}
+
+.card-fac::before   { background: linear-gradient(90deg, #1a6faf, #2589d4); }
+.card-an::before    { background: linear-gradient(90deg, #0e7490, #06b6d4); }
+.card-youth::before { background: linear-gradient(90deg, #0f766e, #0fa87e); }
+.card-cc::before    { background: linear-gradient(90deg, #b45309, #e09c00); }
+
+.date-card-body {
+  padding: 14px 14px 16px;
+}
+
+.card-category {
+  font-size: 9px;
+  font-family: var(--mono);
+  font-weight: 500;
+  letter-spacing: 1.1px;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.cat-adult   { color: #1a6faf; }
+.cat-youth   { color: #0f766e; }
+.cat-community { color: #b45309; }
+
+.card-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-main);
+  line-height: 1.3;
+  margin-bottom: 10px;
+}
+
+.card-date {
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--navy);
+  line-height: 1.5;
+}
+
+/* pushed badge shown when date moved past blackout */
+.pushed-badge {
+  display: none;
+  margin-top: 6px;
+  font-size: 10px;
+  font-family: var(--mono);
+  color: var(--amber);
+  background: rgba(224,156,0,0.1);
+  border: 1px solid rgba(224,156,0,0.25);
+  border-radius: 4px;
+  padding: 2px 7px;
+  width: fit-content;
+}
+.pushed-badge.visible { display: inline-block; }
+
+/* ═══════════════════════════════════════
+   FOOTER NOTE
+═══════════════════════════════════════ */
+.footer-note {
+  margin-top: 18px;
+  padding: 12px 14px;
+  background: var(--navy);
+  border-radius: var(--r-sm);
+  font-size: 11px;
+  font-family: var(--mono);
+  color: var(--grey-300);
+  line-height: 1.7;
+}
+
+.footer-note span {
+  display: inline-block;
+  color: var(--sky);
+  margin-right: 4px;
+}
+
+/* ═══════════════════════════════════════
+   PAGE FOOTER
+═══════════════════════════════════════ */
+footer {
+  text-align: center;
+  padding: 16px 16px calc(env(safe-area-inset-bottom) + 16px);
+  font-size: 11px;
+  font-family: var(--mono);
+  color: var(--grey-500);
+  border-top: 1px solid var(--grey-100);
+  letter-spacing: 0.3px;
+}
+
+/* ═══════════════════════════════════════
+   RESPONSIVE — single column on very small screens
+═══════════════════════════════════════ */
+@media (max-width: 360px) {
+  .date-cards { grid-template-columns: 1fr; }
+  .card-date  { font-size: 12px; }
+}
+
+/* wider screens — let it breathe */
+@media (min-width: 500px) {
+  .main { padding: 24px 20px 48px; }
+  .date-card-body { padding: 16px 16px 18px; }
+  .card-title { font-size: 13px; }
+  .card-date  { font-size: 14px; }
+}
+
+</style>
 </head>
 <body>
-<div class="app-container">
-  <div class="hero-card">
-    <div class="logo-area">
-      <div class="court-emblem">⚖️</div>
-      <div class="title-text">
-        <h1>Alberta Court Calendar</h1>
-        <p>Transit Public Safety | EMCS</p>
-      </div>
-    </div>
-    <div class="badge-safe">
-      <span>✓</span> CHARACTER-COMMITMENT-COMPETENCE-COLLABORATION
-    </div>
-  </div>
 
-  <div class="input-panel">
-    <div class="date-input-group">
-      <div class="date-field">
-        <label>📅 Select issue date</label>
-        <input type="date" id="searchDate">
-      </div>
-      <button class="btn-lookup" id="lookupBtn">🔍 Find court dates</button>
-      <button class="btn-lookup reset-btn" id="todayBtn">📆 Today</button>
+<!-- ── HEADER ── -->
+<div class="header">
+  <div class="header-inner">
+    <div class="header-eyebrow">
+      <span class="badge">Calgary Transit</span>
+      <span class="badge badge-alberta">Alberta</span>
     </div>
-  </div>
-
-  <div class="results-card" id="resultsContainer">
-    <div class="result-header">
-      <h2>📋 Assigned court appearances</h2>
-    </div>
-    <div id="dynamicResult">
-      <div class="no-match">⚖️ Select an issue date and press "Find court dates"</div>
+    <h1>Court Date Calculator</h1>
+    <p class="header-sub">2026 – 2027 &nbsp;·&nbsp; Offence date lookup</p>
+    <div class="header-rules">
+      <span class="rule-chip">No weekends</span>
+      <span class="rule-chip">No stat holidays</span>
+      <span class="rule-chip">Dec 18 – Jan 4 blackout</span>
     </div>
   </div>
 </div>
 
-<script>
-  (function() {
-    // ----- ALBERTA STATUTORY HOLIDAYS (2026-2027) -----
-    const statutoryHolidays = [
-      "2026-01-01", "2026-02-16", "2026-04-03", "2026-05-18", "2026-07-01",
-      "2026-08-03", "2026-09-07", "2026-09-30", "2026-10-12", "2026-11-11",
-      "2026-12-25", "2026-12-26", "2027-01-01", "2027-02-15", "2027-03-26",
-      "2027-05-24", "2027-07-01", "2027-08-02", "2027-09-06", "2027-09-30",
-      "2027-10-11", "2027-11-11", "2027-12-25", "2027-12-26"
-    ];
+<!-- ── MAIN ── -->
+<div class="main">
 
-    function isInBlackoutPeriod(date) {
-      const month = date.getMonth();
-      const day = date.getDate();
-      if (month === 11 && day >= 18) return true;
-      if (month === 0 && day <= 4) return true;
-      return false;
-    }
+  <!-- Input -->
+  <div class="input-card">
+    <label class="input-label" for="dateInput">Select Offence Date</label>
+    <div class="input-row">
+      <input type="date" id="dateInput" value="2026-05-15">
+      <button class="btn btn-primary" onclick="lookup()">Calculate</button>
+      <button class="btn btn-secondary" onclick="useToday()">Today</button>
+    </div>
+    <div class="range-note">
+      Valid: <strong>May 4, 2026</strong> – <strong>Jan 15, 2027</strong>
+    </div>
+  </div>
 
-    function isWeekend(date) {
-      const day = date.getDay();
-      return day === 0 || day === 6;
-    }
+  <!-- Error -->
+  <div class="error-box" id="errorBox"></div>
 
-    function isHoliday(date) {
-      const dateStr = date.toISOString().split('T')[0];
-      return statutoryHolidays.includes(dateStr);
-    }
+  <!-- Results -->
+  <div class="results-block" id="resultsBlock">
 
-    function isCourtDay(date) {
-      return !isWeekend(date) && !isHoliday(date) && !isInBlackoutPeriod(date);
-    }
+    <div class="issue-pill">
+      <div>
+        <div class="issue-pill-label">Offence Date</div>
+        <div class="issue-pill-date" id="issueDateDisplay">—</div>
+      </div>
+    </div>
 
-    function nextValidCourtDay(startDate) {
-      const result = new Date(startDate);
-      while (!isCourtDay(result)) {
-        result.setDate(result.getDate() + 1);
-      }
-      return result;
-    }
+    <div class="date-cards">
 
-    function formatDate(date) {
-      const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-      return `${days[date.getDay()]} ${months[date.getMonth()]} ${date.getDate()} ${date.getFullYear()}`;
-    }
-
-    function formatDateRange(startDate, endDate) {
-      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-      if (startDate.getMonth() === endDate.getMonth()) {
-        return `${months[startDate.getMonth()]} ${startDate.getDate()} - ${endDate.getDate()} ${endDate.getFullYear()}`;
-      } else {
-        return `${months[startDate.getMonth()]} ${startDate.getDate()} - ${months[endDate.getMonth()]} ${endDate.getDate()} ${endDate.getFullYear()}`;
-      }
-    }
-
-    // ----- RULE 1: First Appearance (Adult) -----
-    // Min 6 weeks (42 days), Max 8 weeks (56 days), any weekday
-    function calculateFirstAppearance(offenseDate) {
-      const minDate = new Date(offenseDate);
-      minDate.setDate(offenseDate.getDate() + 42);  // 6 weeks
-      
-      const maxDate = new Date(offenseDate);
-      maxDate.setDate(offenseDate.getDate() + 56);  // 8 weeks
-      
-      // Find first valid court day within the range
-      let candidate = new Date(minDate);
-      while (candidate <= maxDate) {
-        if (isCourtDay(candidate)) {
-          // Return a 3-day range starting from this date
-          let endDate = new Date(candidate);
-          endDate.setDate(candidate.getDate() + 2);
-          // Ensure end date is also a valid court day (move forward if needed)
-          while (!isCourtDay(endDate)) {
-            endDate.setDate(endDate.getDate() + 1);
-          }
-          return formatDateRange(candidate, endDate);
-        }
-        candidate.setDate(candidate.getDate() + 1);
-      }
-      
-      // Fallback: find nearest valid court day after minDate
-      let fallback = nextValidCourtDay(minDate);
-      let endDate = new Date(fallback);
-      endDate.setDate(fallback.getDate() + 2);
-      while (!isCourtDay(endDate)) {
-        endDate.setDate(endDate.getDate() + 1);
-      }
-      return formatDateRange(fallback, endDate);
-    }
-
-    // ----- RULE 2: Appearance Notice (Adult) -----
-    // Min 8 weeks (56 days), Max 10 weeks (70 days), Monday or Wednesday only
-    function calculateAppearanceNotice(offenseDate) {
-      const minDate = new Date(offenseDate);
-      minDate.setDate(offenseDate.getDate() + 56);
-      const maxDate = new Date(offenseDate);
-      maxDate.setDate(offenseDate.getDate() + 70);
-      
-      let candidate = new Date(minDate);
-      while (candidate <= maxDate) {
-        const dayOfWeek = candidate.getDay();
-        if ((dayOfWeek === 1 || dayOfWeek === 3) && isCourtDay(candidate)) {
-          return formatDate(candidate);
-        }
-        candidate.setDate(candidate.getDate() + 1);
-      }
-      
-      return formatDate(nextValidCourtDay(minDate));
-    }
-
-    // ----- RULE 3: Youth FAC & Appearance Notice -----
-    // Min 6 weeks (42 days), Max 10 weeks (70 days), FIRST THURSDAY of each month
-    function calculateYouthDate(offenseDate) {
-      const minDate = new Date(offenseDate);
-      minDate.setDate(offenseDate.getDate() + 42);
-      const maxDate = new Date(offenseDate);
-      maxDate.setDate(offenseDate.getDate() + 70);
-
-      let year = minDate.getFullYear();
-      let month = minDate.getMonth();
-      
-      while (true) {
-        const firstOfMonth = new Date(year, month, 1);
-        if (firstOfMonth > maxDate) break;
-        
-        // Find first Thursday of this month (Thursday = 4)
-        const daysUntilThursday = (4 - firstOfMonth.getDay() + 7) % 7;
-        const firstThursday = new Date(year, month, 1 + daysUntilThursday);
-        
-        if (firstThursday >= minDate && firstThursday <= maxDate && isCourtDay(firstThursday)) {
-          return formatDate(firstThursday);
-        }
-        
-        month++;
-        if (month > 11) {
-          month = 0;
-          year++;
-        }
-      }
-      
-      return formatDate(nextValidCourtDay(minDate));
-    }
-
-    // ----- RULE 4: Community Court -----
-    // Min 5 weeks (35 days), Max 8 weeks (56 days), Tuesday only
-    function calculateCommunityCourt(offenseDate) {
-      const minDate = new Date(offenseDate);
-      minDate.setDate(offenseDate.getDate() + 35);
-      const maxDate = new Date(offenseDate);
-      maxDate.setDate(offenseDate.getDate() + 56);
-      
-      let candidate = new Date(minDate);
-      while (candidate <= maxDate) {
-        if (candidate.getDay() === 2 && isCourtDay(candidate)) {
-          return formatDate(candidate);
-        }
-        candidate.setDate(candidate.getDate() + 1);
-      }
-      
-      let fallback = new Date(minDate);
-      while (fallback.getDay() !== 2 || !isCourtDay(fallback)) {
-        fallback.setDate(fallback.getDate() + 1);
-      }
-      return formatDate(fallback);
-    }
-
-    // Issue date ranges (from specimen calendar)
-    const issueRanges = [
-      { start: [2026, 4, 4], end: [2026, 4, 6] },      // May 4-6
-      { start: [2026, 4, 7], end: [2026, 4, 10] },     // May 7-10
-      { start: [2026, 4, 11], end: [2026, 4, 13] },    // May 11-13
-      { start: [2026, 4, 14], end: [2026, 4, 17] },    // May 14-17
-      { start: [2026, 4, 18], end: [2026, 4, 20] },    // May 18-20
-      { start: [2026, 4, 21], end: [2026, 4, 24] },    // May 21-24
-      { start: [2026, 4, 25], end: [2026, 4, 27] },    // May 25-27
-      { start: [2026, 4, 28], end: [2026, 4, 31] },    // May 28-31
-      { start: [2026, 5, 1], end: [2026, 5, 3] },      // Jun 1-3
-      { start: [2026, 5, 4], end: [2026, 5, 7] },      // Jun 4-7
-      { start: [2026, 5, 8], end: [2026, 5, 10] },     // Jun 8-10
-      { start: [2026, 5, 11], end: [2026, 5, 14] },    // Jun 11-14
-      { start: [2026, 5, 15], end: [2026, 5, 17] },    // Jun 15-17
-      { start: [2026, 5, 18], end: [2026, 5, 21] },    // Jun 18-21
-      { start: [2026, 5, 22], end: [2026, 5, 24] },    // Jun 22-24
-      { start: [2026, 5, 25], end: [2026, 5, 28] },    // Jun 25-28
-      { start: [2026, 5, 29], end: [2026, 6, 1] },     // Jun 29-Jul 1
-      { start: [2026, 6, 2], end: [2026, 6, 5] },      // Jul 2-5
-      { start: [2026, 6, 6], end: [2026, 6, 8] },      // Jul 6-8
-      { start: [2026, 6, 9], end: [2026, 6, 12] },     // Jul 9-12
-      { start: [2026, 6, 13], end: [2026, 6, 15] },    // Jul 13-15
-      { start: [2026, 6, 16], end: [2026, 6, 19] },    // Jul 16-19
-      { start: [2026, 6, 20], end: [2026, 6, 22] },    // Jul 20-22
-      { start: [2026, 6, 23], end: [2026, 6, 26] },    // Jul 23-26
-      { start: [2026, 6, 27], end: [2026, 6, 29] },    // Jul 27-29
-      { start: [2026, 6, 30], end: [2026, 7, 2] },     // Jul 30-Aug 2
-      { start: [2026, 7, 3], end: [2026, 7, 5] },      // Aug 3-5
-      { start: [2026, 7, 6], end: [2026, 7, 9] },      // Aug 6-9
-      { start: [2026, 7, 10], end: [2026, 7, 12] },    // Aug 10-12
-      { start: [2026, 7, 13], end: [2026, 7, 16] },    // Aug 13-16
-      { start: [2026, 7, 17], end: [2026, 7, 19] },    // Aug 17-19
-      { start: [2026, 7, 20], end: [2026, 7, 23] },    // Aug 20-23
-      { start: [2026, 7, 24], end: [2026, 7, 26] },    // Aug 24-26
-      { start: [2026, 7, 27], end: [2026, 7, 30] },    // Aug 27-30
-      { start: [2026, 7, 31], end: [2026, 8, 2] },     // Aug 31-Sep 2
-      { start: [2026, 8, 3], end: [2026, 8, 6] },      // Sep 3-6
-      { start: [2026, 8, 7], end: [2026, 8, 9] },      // Sep 7-9
-      { start: [2026, 8, 10], end: [2026, 8, 13] },    // Sep 10-13
-      { start: [2026, 8, 14], end: [2026, 8, 16] },    // Sep 14-16
-      { start: [2026, 8, 17], end: [2026, 8, 20] },    // Sep 17-20
-      { start: [2026, 8, 21], end: [2026, 8, 23] },    // Sep 21-23
-      { start: [2026, 8, 24], end: [2026, 8, 27] },    // Sep 24-27
-      { start: [2026, 8, 28], end: [2026, 8, 30] },    // Sep 28-30
-      { start: [2026, 9, 1], end: [2026, 9, 4] },      // Oct 1-4
-      { start: [2026, 9, 5], end: [2026, 9, 7] },      // Oct 5-7
-      { start: [2026, 9, 8], end: [2026, 9, 11] },     // Oct 8-11
-      { start: [2026, 9, 12], end: [2026, 9, 14] },    // Oct 12-14
-      { start: [2026, 9, 15], end: [2026, 9, 18] },    // Oct 15-18
-      { start: [2026, 9, 19], end: [2026, 9, 21] },    // Oct 19-21
-      { start: [2026, 9, 22], end: [2026, 9, 25] },    // Oct 22-25
-      { start: [2026, 9, 26], end: [2026, 9, 28] },    // Oct 26-28
-      { start: [2026, 9, 29], end: [2026, 10, 1] },    // Oct 29-Nov 1
-      { start: [2026, 10, 2], end: [2026, 10, 4] },    // Nov 2-4
-      { start: [2026, 10, 5], end: [2026, 10, 8] },    // Nov 5-8
-      { start: [2026, 10, 9], end: [2026, 10, 11] },   // Nov 9-11
-      { start: [2026, 10, 12], end: [2026, 10, 15] },  // Nov 12-15
-      { start: [2026, 10, 16], end: [2026, 10, 18] },  // Nov 16-18
-      { start: [2026, 10, 19], end: [2026, 10, 22] },  // Nov 19-22
-      { start: [2026, 10, 23], end: [2026, 10, 25] },  // Nov 23-25
-      { start: [2026, 10, 26], end: [2026, 10, 29] },  // Nov 26-29
-      { start: [2026, 10, 30], end: [2026, 11, 2] },   // Nov 30-Dec 2
-      { start: [2026, 11, 3], end: [2026, 11, 6] },    // Dec 3-6
-      { start: [2026, 11, 7], end: [2026, 11, 9] },    // Dec 7-9
-      { start: [2026, 11, 10], end: [2026, 11, 13] },  // Dec 10-13
-      { start: [2026, 11, 14], end: [2026, 11, 16] },  // Dec 14-16
-      { start: [2026, 11, 17], end: [2026, 11, 20] },  // Dec 17-20
-      { start: [2026, 11, 21], end: [2026, 11, 23] },  // Dec 21-23
-      { start: [2026, 11, 24], end: [2026, 11, 27] },  // Dec 24-27
-      { start: [2026, 11, 28], end: [2026, 11, 30] },  // Dec 28-30
-      { start: [2026, 11, 31], end: [2027, 0, 3] },    // Dec 31-Jan 3
-      { start: [2027, 0, 4], end: [2027, 0, 6] },      // Jan 4-6
-      { start: [2027, 0, 7], end: [2027, 0, 10] },     // Jan 7-10
-      { start: [2027, 0, 11], end: [2027, 0, 13] },    // Jan 11-13
-      { start: [2027, 0, 14], end: [2027, 0, 15] }     // Jan 14-15
-    ];
-
-    const calendarData = [];
-    for (const range of issueRanges) {
-      const startDate = new Date(range.start[0], range.start[1], range.start[2], 12, 0, 0);
-      const endDate = new Date(range.end[0], range.end[1], range.end[2], 12, 0, 0);
-      // Use the start date of the range for calculations (more conservative)
-      const offenseDate = startDate;
-      
-      calendarData.push({
-        start: startDate,
-        end: endDate,
-        firstAppearance: calculateFirstAppearance(offenseDate),
-        appearanceNotice: calculateAppearanceNotice(offenseDate),
-        youthDate: calculateYouthDate(offenseDate),
-        communityCourt: calculateCommunityCourt(offenseDate)
-      });
-    }
-
-    function findMatchingRow(dateObj) {
-      for (let row of calendarData) {
-        if (dateObj >= row.start && dateObj <= row.end) {
-          return row;
-        }
-      }
-      return null;
-    }
-
-    function displayResult(row, searchedDateStr) {
-      const container = document.getElementById('dynamicResult');
-      if (!row) {
-        container.innerHTML = `
-          <div class="no-match">
-            ❌ <strong>No court schedule found for ${searchedDateStr}</strong><br><br>
-            Please select an issue date between <strong>May 4, 2026</strong> and <strong>January 15, 2027</strong>.
-          </div>
-        `;
-        return;
-      }
-      container.innerHTML = `
-        <table class="info-table">
-          <tr><td style="background:#e8f0fe;">⚖️ First Appearance Court (Adult)</td><td>${row.firstAppearance}</td></tr>
-          <tr><td style="background:#e8f0fe;">📄 Appearance Notice (Adult)</td><td>${row.appearanceNotice}</td></tr>
-          <tr><td style="background:#e8f0fe;">🧑‍🦱 Youth FAC & Appearance Notice</td><td>${row.youthDate}</td></tr>
-          <tr><td style="background:#e8f0fe;">🏛️ Community Court</td><td>${row.communityCourt}</td></tr>
-        </table>
-        <div style="padding: 0.8rem 1.8rem 1.2rem 1.8rem; font-size:0.7rem; background:#f0f4fa; border-top:1px solid #e0e8f0;">
-          ✅ All dates: Weekdays only | No Alberta statutory holidays | No Dec 18 - Jan 4 blackout
+      <div class="date-card card-fac">
+        <div class="date-card-body">
+          <div class="card-category cat-adult">Adult</div>
+          <div class="card-title">First Appearance Court</div>
+          <div class="card-date" id="col1">—</div>
+          <div class="pushed-badge" id="col1-push">↑ Past blackout</div>
         </div>
-      `;
-    }
+      </div>
 
-    function lookupFromDate(dateValue) {
-      if (!dateValue) {
-        document.getElementById('dynamicResult').innerHTML = `<div class="no-match">⚖️ Please select an issue date.</div>`;
-        return;
-      }
-      const parts = dateValue.split('-');
-      const year = parseInt(parts[0]);
-      const month = parseInt(parts[1]) - 1;
-      const day = parseInt(parts[2]);
-      const normalized = new Date(year, month, day, 12, 0, 0);
-      const matched = findMatchingRow(normalized);
-      displayResult(matched, dateValue);
-    }
+      <div class="date-card card-an">
+        <div class="date-card-body">
+          <div class="card-category cat-adult">Adult</div>
+          <div class="card-title">Appearance Notice</div>
+          <div class="card-date" id="col2">—</div>
+          <div class="pushed-badge" id="col2-push">↑ Past blackout</div>
+        </div>
+      </div>
 
-    const dateInput = document.getElementById('searchDate');
-    const lookupBtn = document.getElementById('lookupBtn');
-    const todayBtn = document.getElementById('todayBtn');
+      <div class="date-card card-youth">
+        <div class="date-card-body">
+          <div class="card-category cat-youth">Youth</div>
+          <div class="card-title">FAC &amp; Appearance Notice</div>
+          <div class="card-date" id="col3">—</div>
+          <div class="pushed-badge" id="col3-push">↑ Past blackout</div>
+        </div>
+      </div>
 
-    dateInput.value = "2026-05-15";
-    lookupFromDate("2026-05-15");
+      <div class="date-card card-cc">
+        <div class="date-card-body">
+          <div class="card-category cat-community">Community</div>
+          <div class="card-title">Community Court</div>
+          <div class="card-date" id="col4">—</div>
+          <div class="pushed-badge" id="col4-push">↑ Past blackout</div>
+        </div>
+      </div>
 
-    lookupBtn.addEventListener('click', () => {
-      if (dateInput.value) lookupFromDate(dateInput.value);
-    });
+    </div><!-- /date-cards -->
 
-    todayBtn.addEventListener('click', () => {
-      const today = new Date();
-      const yyyy = today.getFullYear();
-      const mm = String(today.getMonth() + 1).padStart(2, '0');
-      const dd = String(today.getDate()).padStart(2, '0');
-      const todayStr = `${yyyy}-${mm}-${dd}`;
-      dateInput.value = todayStr;
-      lookupFromDate(todayStr);
-    });
+    <div class="footer-note">
+      <span>⚖</span> First Appearance shows a 3-day window.
+      Appearance Notice: Mon or Wed only.
+      Youth: first Thursday of the month.
+      Community Court: Tuesdays only.
+      Dates pushed past the Dec 18–Jan 4 blackout are marked <span style="color:var(--amber)">↑ Past blackout</span>.
+    </div>
 
-    dateInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') lookupFromDate(dateInput.value);
-    });
-  })();
+  </div><!-- /results-block -->
+
+</div><!-- /main -->
+
+<footer>
+  Calgary Transit Peace Officers &nbsp;·&nbsp; AB Court Date Calculator 2026–27
+</footer>
+
+<script>
+/* ═══════════════════════════════════════════════════════
+   ALBERTA COURT DATE CALCULATOR
+   Covers: May 4 2026 – Jan 15 2027
+   Blackout rule: Dec 18 – Jan 4 → push to next valid date
+═══════════════════════════════════════════════════════ */
+
+// ── Alberta statutory holidays ──
+const HOLIDAYS = new Set([
+  "2026-01-01","2026-02-16","2026-04-03","2026-05-18","2026-07-01",
+  "2026-08-03","2026-09-07","2026-09-30","2026-10-12","2026-11-11",
+  "2026-12-25","2026-12-26",
+  "2027-01-01","2027-02-15","2027-03-26","2027-05-24","2027-07-01",
+  "2027-08-02","2027-09-06","2027-09-30","2027-10-11","2027-11-11",
+  "2027-12-25","2027-12-26"
+]);
+
+const DAY  = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+const MON  = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
+const RANGE_START = new Date(2026, 4,  4, 12);  // May  4 2026
+const RANGE_END   = new Date(2027, 0, 15, 12);  // Jan 15 2027
+
+// ── Date helpers ──
+
+function addDays(d, n) {
+  const r = new Date(d);
+  r.setDate(r.getDate() + n);
+  return r;
+}
+
+function toKey(d) {
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+}
+
+// Dec 18 – Jan 4 blackout
+function isBlackout(d) {
+  const m = d.getMonth(), day = d.getDate();
+  return (m === 11 && day >= 18) || (m === 0 && day <= 4);
+}
+
+function isWeekend(d) { return d.getDay() === 0 || d.getDay() === 6; }
+function isHoliday(d) { return HOLIDAYS.has(toKey(d)); }
+function isCourtDay(d) { return !isWeekend(d) && !isHoliday(d) && !isBlackout(d); }
+
+/**
+ * Starting at d, find the next date that:
+ *   (a) is a valid court day, AND
+ *   (b) passes filterFn (optional)
+ * No window limit — always returns a result (blackout push).
+ */
+function nextValidWhere(d, filterFn) {
+  let cur = new Date(d);
+  for (let i = 0; i < 400; i++) {
+    if (isCourtDay(cur) && (!filterFn || filterFn(cur))) return cur;
+    cur = addDays(cur, 1);
+  }
+  return null;
+}
+
+// ── Formatters ──
+
+function fmt(d) {
+  return `${DAY[d.getDay()]} ${MON[d.getMonth()]} ${d.getDate()} ${d.getFullYear()}`;
+}
+
+function fmtRange(d1, d2) {
+  const m1 = MON[d1.getMonth()], m2 = MON[d2.getMonth()];
+  const y1 = d1.getFullYear(), y2 = d2.getFullYear();
+  if (y1 !== y2) return `${m1} ${d1.getDate()} ${y1} –\n${m2} ${d2.getDate()} ${y2}`;
+  if (m1 === m2)  return `${m1} ${d1.getDate()} – ${d2.getDate()} ${y1}`;
+  return `${m1} ${d1.getDate()} –\n${m2} ${d2.getDate()} ${y1}`;
+}
+
+// ── Column calculators ──
+// All use nextValidWhere so blackout dates are automatically pushed forward.
+
+/**
+ * Col 1 — First Appearance Court (Adult)
+ * Window: 6–8 weeks (42–56 days), any weekday
+ * Output: 3 consecutive valid court days as a range string
+ * If the natural window is entirely inside blackout, push past it.
+ */
+function calcCol1(issue) {
+  const min = addDays(issue, 42);
+  const max = addDays(issue, 56);
+  const d1 = nextValidWhere(min, null);
+  const d2 = nextValidWhere(addDays(d1, 1), null);
+  const d3 = nextValidWhere(addDays(d2, 1), null);
+  const pushed = d1 > max;
+  return { text: fmtRange(d1, d3), pushed };
+}
+
+/**
+ * Col 2 — Appearance Notice (Adult)
+ * Window: 8–10 weeks (56–70 days), Monday (1) or Wednesday (3) only
+ */
+function calcCol2(issue) {
+  const min = addDays(issue, 56);
+  const max = addDays(issue, 70);
+  const d = nextValidWhere(min, d => { const w = d.getDay(); return w === 1 || w === 3; });
+  return { text: fmt(d), pushed: d > max };
+}
+
+/**
+ * Col 3 — Youth FAC & Appearance Notice
+ * Window: 6–10 weeks (42–70 days), FIRST Thursday of each month
+ * If the first Thursday of a month is a holiday/blackout, skip to next month.
+ */
+function calcCol3(issue) {
+  const min = addDays(issue, 42);
+  const max = addDays(issue, 70);
+  let year = min.getFullYear(), month = min.getMonth();
+  for (let attempt = 0; attempt < 14; attempt++) {
+    // Find first Thursday of this month
+    let d = new Date(year, month, 1, 12);
+    while (d.getDay() !== 4) d = addDays(d, 1);
+    if (d >= min && isCourtDay(d)) return { text: fmt(d), pushed: d > max };
+    month++;
+    if (month > 11) { month = 0; year++; }
+  }
+  // Fallback — should never reach here within the calendar range
+  const d = nextValidWhere(min, d => d.getDay() === 4);
+  return { text: fmt(d), pushed: d > max };
+}
+
+/**
+ * Col 4 — Community Court
+ * Window: 5–8 weeks (35–56 days), Tuesday (2) only
+ */
+function calcCol4(issue) {
+  const min = addDays(issue, 35);
+  const max = addDays(issue, 56);
+  const d = nextValidWhere(min, d => d.getDay() === 2);
+  return { text: fmt(d), pushed: d > max };
+}
+
+// ── UI ──
+
+function lookup() {
+  const val = document.getElementById("dateInput").value;
+  const errorBox     = document.getElementById("errorBox");
+  const resultsBlock = document.getElementById("resultsBlock");
+
+  errorBox.style.display     = "none";
+  resultsBlock.style.display = "none";
+
+  if (!val) { showError("Please select an offence date."); return; }
+
+  const [y, m, day] = val.split("-").map(Number);
+  const issue = new Date(y, m - 1, day, 12);
+
+  if (issue < RANGE_START || issue > RANGE_END) {
+    showError(
+      `<strong>${fmt(issue)}</strong> is outside the supported range.<br>` +
+      `Please enter a date between <strong>May 4, 2026</strong> and <strong>Jan 15, 2027</strong>.`
+    );
+    return;
+  }
+
+  const c1 = calcCol1(issue);
+  const c2 = calcCol2(issue);
+  const c3 = calcCol3(issue);
+  const c4 = calcCol4(issue);
+
+  document.getElementById("issueDateDisplay").textContent = fmt(issue);
+
+  setCard("col1", c1);
+  setCard("col2", c2);
+  setCard("col3", c3);
+  setCard("col4", c4);
+
+  resultsBlock.style.display = "block";
+  // smooth scroll to results on mobile
+  setTimeout(() => {
+    document.getElementById("resultsBlock").scrollIntoView({ behavior: "smooth", block: "start" });
+  }, 50);
+}
+
+function setCard(id, result) {
+  // newline → <br> for the range display
+  document.getElementById(id).innerHTML = result.text.replace(/\n/g, "<br>");
+  const push = document.getElementById(id + "-push");
+  if (push) push.classList.toggle("visible", !!result.pushed);
+}
+
+function showError(msg) {
+  const el = document.getElementById("errorBox");
+  el.innerHTML = msg;
+  el.style.display = "block";
+}
+
+function useToday() {
+  const t = new Date();
+  const y = t.getFullYear();
+  const m = String(t.getMonth() + 1).padStart(2, "0");
+  const d = String(t.getDate()).padStart(2, "0");
+  document.getElementById("dateInput").value = `${y}-${m}-${d}`;
+  lookup();
+}
+
+// Run on load with default date
+window.addEventListener("DOMContentLoaded", lookup);
 </script>
 </body>
 </html>
